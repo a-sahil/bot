@@ -1,4 +1,5 @@
 import axios from "axios";
+import { NextApiRequest, NextApiResponse } from "next";
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 // Add both your Chat ID and your friend's Chat ID
@@ -6,9 +7,9 @@ const CHAT_IDS = [process.env.YOUR_CHAT_ID, process.env.FRIEND_CHAT_ID];
 
 const LOW_THRESHOLD = 2730;
 const HIGH_THRESHOLD = 2760;
-let lastNotified = { low: false, high: false };
+const lastNotified = { low: false, high: false };
 
-export default async function handler(req: any, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { price?: any; error?: string; }): void; new(): any; }; }; }) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     // Fetch Ethereum price from CoinGecko
     const response = await axios.get(
