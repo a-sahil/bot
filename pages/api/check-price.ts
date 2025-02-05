@@ -1,13 +1,14 @@
 import axios from "axios";
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+// Add both your Chat ID and your friend's Chat ID
+const CHAT_IDS = [process.env.YOUR_CHAT_ID, process.env.FRIEND_CHAT_ID];
 
-const LOW_THRESHOLD = 2720;
-const HIGH_THRESHOLD = 2780;
+const LOW_THRESHOLD = 2730;
+const HIGH_THRESHOLD = 2760;
 let lastNotified = { low: false, high: false };
 
-export default async function handler(req, res) {
+export default async function handler(req: any, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { price?: any; error?: string; }): void; new(): any; }; }; }) {
   try {
     // Fetch Ethereum price from CoinGecko
     const response = await axios.get(
@@ -35,17 +36,19 @@ export default async function handler(req, res) {
   }
 }
 
-// Function to send Telegram notification
 async function sendTelegramMessage(message: string) {
   const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-  
-  try {
-    await axios.post(url, {
-      chat_id: TELEGRAM_CHAT_ID,
-      text: message,
-    });
-    console.log("Telegram message sent:", message);
-  } catch (error) {
-    console.error("Failed to send Telegram message:", error);
+
+  // Loop through all Chat IDs to send the message to both
+  for (const chatId of CHAT_IDS) {
+    try {
+      await axios.post(url, {
+        chat_id: chatId,
+        text: message,
+      });
+      console.log(`Telegram message sent to chat ID: ${chatId}`);
+    } catch (error) {
+      console.error(`Failed to send Telegram message to chat ID: ${chatId}`, error);
+    }
   }
 }
